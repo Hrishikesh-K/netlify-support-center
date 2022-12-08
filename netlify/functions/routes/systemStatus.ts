@@ -11,7 +11,6 @@ export default function (_ : Request, response : Response, next : NextFunction) 
   }).then((statusDetails: {
     data: _SpStatus
   }) => {
-    console.log(statusDetails.data.status)
     try {
       response.status(200).json(<_SpStatus>{
         page: {
@@ -22,8 +21,7 @@ export default function (_ : Request, response : Response, next : NextFunction) 
           indicator: statusDetails.data.status.indicator
         }
       })
-    } catch (err) {
-      console.log(err)
+    } catch {
       return next(new ApiError('Failed to parse data from Statuspage', 500))
     }
   }, (statusDetailsError : AxiosError) => {

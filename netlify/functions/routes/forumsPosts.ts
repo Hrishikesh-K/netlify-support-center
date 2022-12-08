@@ -33,7 +33,6 @@ export default function (_ : Request, response : Response, next : NextFunction) 
       return next(new ApiError('Failed to parse data from Discourse', 500))
     }
   }, (topPostsError : AxiosError) => {
-    console.log(topPostsError)
     return next(new ApiError('Failed to fetch data from Discourse', topPostsError.response?.status))
   })
 }
