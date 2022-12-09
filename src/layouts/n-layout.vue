@@ -321,7 +321,7 @@
                 text = "Logout"
                 variant = "danger"
                 v-bind:saving = "savingBtnLogout"
-                v-on:click = "savingBtnLogout ? null : logout"/>
+                v-on:click = "savingBtnLogout ? null : logout()"/>
             </div>
           </template>
         </NTooltip>

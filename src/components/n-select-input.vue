@@ -10,9 +10,11 @@
   }>()
   const selectInputProps = withDefaults(defineProps<{
     label : string
+    multiple : boolean
     options : Array<_UiSupportCategory>
   }>(), {
     label: '',
+    multiple: false,
     options: () => {
       return []
     }
@@ -58,6 +60,18 @@
               w-scrollbar = "thin thumb-lTeal400 track-lTeal500 dark:thumb-dTeal400 dark:track-dTeal500"
               w-w = "full">
               <div
+                v-if = "selectInputProps.multiple">
+                <input
+                  type = "checkbox"
+                  w-appearance = "none"
+                  w-bg = "checked:dark:dTeal200 dark:dGray700"
+                  w-border = "1 rounded-md solid checked:dark:dTeal300 dark:dGray200"
+                  w-cursor = "pointer"
+                  w-h = "5"
+                  w-ring = "focus:2 focus:offset-2 focus:dark:dTeal300 focus:dark:offset-cBlack"
+                  w-w = "5"/>
+              </div>
+              <div
                 w-box = "border"
                 w-cursor = "pointer"
                 w-font = "medium"
@@ -66,6 +80,7 @@
                 w-w = "full"
                 v-bind:key = "option.id"
                 v-bind:w-bg = "option.id === selectChoice.id ? 'lBlue100 dark:dBlue200 hover:lBlue200 hover:dark:dBlue300' : 'cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500'"
+                v-else
                 v-for = "option in selectInputProps.options"
                 v-on:click = "choiceClick(option, props)">{{option.name}}</div>
             </div>

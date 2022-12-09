@@ -6,10 +6,11 @@ import {createRouter, createWebHistory} from 'vue-router'
 import {useStore} from '~/client/store'
 import NLayout from '~/client/layouts/n-layout.vue'
 import 'swiper/css'
-import 'virtual:windi.css'
+//import 'virtual:windi.css'
+import 'uno.css'
 import '~/client/css/styles.css'
 const app = createApp(NLayout)
-app.use(createPinia())
+const pinia = createPinia()
 const store = useStore()
 const router = createRouter({
   history: createWebHistory(),
@@ -68,7 +69,6 @@ const router = createRouter({
     }
   }
 })
-app.use(router)
 router.afterEach(() => {
   store.compLoading = false
 })
@@ -95,4 +95,4 @@ router.beforeEach((to, _, next) => {
   }
   localStorage.removeItem('csrf')
 })
-app.mount('body')
+app.use(pinia).use(router).mount('body')

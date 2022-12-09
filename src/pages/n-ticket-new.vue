@@ -34,11 +34,11 @@
   let ticketFiles = $ref<Array<_UiFile>>([])
   let ticketLink = $ref<string>('')
   let ticketMessage = $ref<string>('')
+  let ticketSubject = $ref<string>('')
   function ticketSubmit() {
     axios({
       data: {
         category: ticketCategory,
-        email: store.nUser.email,
         files: ticketFiles.map(file => {
           return {
             base64: file.base64,
@@ -46,8 +46,8 @@
           }
         }),
         link: ticketLink,
+        subject: ticketSubject,
         message: ticketMessage,
-        name: store.nUser.full_name
       },
       method: 'post',
       url: '/api/ticket/new'
@@ -78,22 +78,13 @@
       </span>.</p>
     </div>
     <form
-      v-on:submit.prevent = "ticketSubmit"
-      v-else>
+      v-else
+      v-on:submit.prevent = "ticketSubmit">
       <NTextInput
-        readonly
         required
-        label = "Name"
+        label = "Subject"
         w-w = "full xs:2/3 sm:1/2"
-        v-model = "store.nUser.full_name"/>
-      <NTextInput
-        readonly
-        required
-        label = "Email"
-        type = "email"
-        w-m = "t-6"
-        w-w = "full xs:2/3 sm:1/2"
-        v-model = "store.nUser.email"/>
+        v-model = "ticketSubject"/>
       <NTextInput
         required
         label = "Link"
@@ -107,9 +98,16 @@
         w-w = "full xs:2/3 sm:1/2"
         v-bind:options = "supportCategories"
         v-on:update-choice = "ticketCategory = $event"/>
+      <NSelectInput
+        multiple
+        label = "Category"
+        w-m = "t-6"
+        w-w = "full xs:2/3 sm:1/2"
+        v-bind:options = "supportCategories"
+        v-on:update-choice = "ticketCategory = $event"/>
       <NEditor
         w-m = "y-6"
-        v-bind:used-size = "sum(store.nUser.email.length, store.nUser.full_name.length, ticketCategory.name.length)"
+        v-bind:used-size = "sum(ticketCategory.name.length, ticketSubject.length)"
         v-model = "ticketMessage"
         v-on:update-files = "ticketFiles = $event"/>
       <NButton

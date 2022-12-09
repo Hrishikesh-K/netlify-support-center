@@ -217,6 +217,7 @@ export default function (request : Request, response : Response, next : NextFunc
           })
         }
       }, (zendeskIdUsersError : AxiosError) => {
+        console.log(zendeskIdUsersError)
         return next(new ApiError('Failed to find users by Netlify ID in Zendesk', zendeskIdUsersError.response?.status))
       })
     })

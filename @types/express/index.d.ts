@@ -1,6 +1,7 @@
 // noinspection JSUnusedGlobalSymbols
 
 import type {HandlerContext, HandlerEvent} from '@netlify/functions'
+import type {_UiFile} from '~/@types'
 declare global {
   namespace Express {
     export interface Request {
@@ -10,11 +11,9 @@ declare global {
       }
       body? : {
         email? : string
-        files? : Array<{
-          base64 : string
-          name : string
-        }>
+        files? : Array<_UiFile>
         message? : string
+        subject? : string
         name? : string
       }
       cookies?: {
