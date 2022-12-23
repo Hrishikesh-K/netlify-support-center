@@ -68,5 +68,5 @@
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true
   },
-  "include": ["**/*"]
+  "include": ["./netlify/functions/**/*", "./src/**/*"],
 }

@@ -41,6 +41,7 @@ export interface _UiFile {
 export interface _UiSupportCategory {
   id : string
   name : string
+  selected : boolean
 }
 export interface _UiToast {
   id : string

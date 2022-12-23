@@ -1,4 +1,4 @@
-<!--suppress AnonymousFunctionJS, ConditionalExpressionJS, ConstantOnRightSideOfComparisonJS, FallThroughInSwitchStatementJS, FunctionWithMultipleReturnPointsJS, FunctionWithInconsistentReturnsJS, HtmlUnknownAttribute, NestedConditionalExpressionJS, NestedFunctionCallJS, NestedSwitchStatementJS, OverlyComplexFunctionJS -->
+<!--suppress AnonymousFunctionJS, ConditionalExpressionJS, ConstantOnRightSideOfComparisonJS, FallThroughInSwitchStatementJS, FunctionWithMultipleReturnPointsJS, FunctionWithInconsistentReturnsJS, HtmlUnknownAttribute, JSValidateTypes, NestedConditionalExpressionJS, NestedFunctionCallJS, NestedSwitchStatementJS, OverlyComplexFunctionJS -->
 <script
   setup
   lang = "ts">

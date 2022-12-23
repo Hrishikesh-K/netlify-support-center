@@ -3,31 +3,67 @@
   setup
   lang = "ts">
   import type {_UiSupportCategory} from '~/@types'
+  import NIcon from '~/client/components/n-icon.vue'
   import NTextInput from '~/client/components/n-text-input.vue'
   import NTooltip from '~/client/components/n-tooltip.vue'
   const selectInputEmits = defineEmits<{
-    (event : 'updateChoice', value : _UiSupportCategory) : void
+    (event : 'updateChoice', value : Array<_UiSupportCategory>) : void
   }>()
   const selectInputProps = withDefaults(defineProps<{
     label : string
-    multiple : boolean
+    limit? : number
+    multiple? : boolean
     options : Array<_UiSupportCategory>
   }>(), {
     label: '',
+    limit: 5,
     multiple: false,
     options: () => {
       return []
     }
   })
-  let selectOpen = $ref<boolean>(false)
-  let selectChoice = $ref<_UiSupportCategory>({
-    id: '',
-    name: ''
+  const selectLimit = $computed(() => {
+    return selectInputProps.options.filter(availableOptions => {
+      return availableOptions.selected
+    }).length === selectInputProps.limit
   })
-  function choiceClick(choice : _UiSupportCategory, props : any) {
-    selectInputEmits('updateChoice', choice)
-    selectChoice = choice
-    props.hide()
+  const selectText = $computed(() => {
+    if (selectInputProps.multiple) {
+      const selectedCount = selectInputProps.options.filter(availableOptions => {
+        return availableOptions.selected
+      }).length
+      if (selectedCount === 1) {
+        return '1 option selected'
+      } else {
+        return `${selectedCount} options selected`
+      }
+    } else if (selectInputProps.options.some(availableOptions => {
+      return availableOptions.selected
+    })) {
+      return selectInputProps.options.find(availableOptions => {
+        return availableOptions.selected
+      })!.name
+    } else {
+      return ''
+    }
+  })
+  let selectOpen = $ref<boolean>(false)
+  function choiceClick(choice : _UiSupportCategory) {
+    if (!selectLimit || choice.selected) {
+      const optionsCopy = selectInputProps.options
+      const clickedOption = optionsCopy.findIndex(availableOptions => {
+        return availableOptions.id === choice.id
+      }) as number
+      optionsCopy[clickedOption]!.selected = !optionsCopy[clickedOption]!.selected
+      if (!selectInputProps.multiple) {
+        optionsCopy.forEach(availableOptions => {
+          if (availableOptions.id !== choice.id) {
+            availableOptions.selected = false
+          }
+        })
+      }
+      selectInputEmits('updateChoice', optionsCopy)
+    }
   }
 </script>
 <template>
@@ -36,6 +72,7 @@
     w-pos = "relative">
     <NTooltip
       full-width
+      keep-open
       v-bind:offset = "2"
       v-on:tooltip-close = "selectOpen = false"
       v-on:tooltip-open = "selectOpen = true">
@@ -46,7 +83,7 @@
         v-bind:dropdown = "selectOpen"
         v-bind:icon-r = "selectOpen ? 'angle-up' : 'angle-down'"
         v-bind:label = "selectInputProps.label"
-        v-model = "selectChoice.name"/>
+        v-model = "selectText"/>
         <template
           v-slot:content = "props">
           <div
@@ -59,18 +96,46 @@
               w-max-h = "50"
               w-scrollbar = "thin thumb-lTeal400 track-lTeal500 dark:thumb-dTeal400 dark:track-dTeal500"
               w-w = "full">
-              <div
+              <template
                 v-if = "selectInputProps.multiple">
-                <input
-                  type = "checkbox"
-                  w-appearance = "none"
-                  w-bg = "checked:dark:dTeal200 dark:dGray700"
-                  w-border = "1 rounded-md solid checked:dark:dTeal300 dark:dGray200"
-                  w-cursor = "pointer"
-                  w-h = "5"
-                  w-ring = "focus:2 focus:offset-2 focus:dark:dTeal300 focus:dark:offset-cBlack"
-                  w-w = "5"/>
-              </div>
+                <div
+                  w-box = "border"
+                  w-p = "x-4 y-2"
+                  w-pos = "relative"
+                  v-bind:key = "option.id"
+                  v-bind:w-cursor = "!option.selected && selectLimit ? 'not-allowed' : 'pointer'"
+                  v-bind:w-opacity = "!option.selected && selectLimit ? '50' : '100'"
+                  v-for = "option in selectInputProps.options"
+                  v-on:click.self = "choiceClick(option)">
+                  <NIcon
+                    w-pointer = "none"
+                    w-pos = "absolute left-5 top-3"
+                    w-text = "dark:dTeal500"
+                    name = "checkbox-tick"
+                    v-bind:size = "3"
+                    v-if = "option.selected"/>
+                  <label
+                    w-align = "items-center"
+                    w-cursor = "pointer"
+                    w-flex = "~"
+                    v-bind:w-pointer = "!option.selected && selectLimit ? 'none' : 'all'">
+                    <input
+                      type = "checkbox"
+                      w-appearance = "none"
+                      w-cursor = "pointer"
+                      w-h = "5"
+                      w-m = "0"
+                      w-ring = "focus:2 focus:offset-2 focus:dark:dTeal300 focus:dark:offset-cBlack"
+                      w-w = "5 before:12"
+                      v-bind:disabled = "!option.selected && selectLimit"
+                      v-bind:w-bg = "option.selected ? 'dark:dTeal200' : ''"
+                      v-bind:w-border = "`${option.selected ? 'dark:dTeal300' : 'dark:dGray200'} 1 rounded-md solid`"
+                      v-on:click.prevent.self = "choiceClick(option)"/>
+                    <span
+                      w-m = "l-2">{{option.name}}</span>
+                  </label>
+                </div>
+              </template>
               <div
                 w-box = "border"
                 w-cursor = "pointer"
@@ -79,10 +144,10 @@
                 w-text = "lGray700 truncate dark:dGray100"
                 w-w = "full"
                 v-bind:key = "option.id"
-                v-bind:w-bg = "option.id === selectChoice.id ? 'lBlue100 dark:dBlue200 hover:lBlue200 hover:dark:dBlue300' : 'cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500'"
+                v-bind:w-bg = "option.selected ? 'lBlue100 dark:dBlue200 hover:lBlue200 hover:dark:dBlue300' : 'cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500'"
                 v-else
                 v-for = "option in selectInputProps.options"
-                v-on:click = "choiceClick(option, props)">{{option.name}}</div>
+                v-on:click = "choiceClick(option); props.hide()">{{option.name}}</div>
             </div>
           </div>
         </template>
@@ -91,5 +156,9 @@
 </template>
 <!--
   <safe
-    w-bg = "cWhite lBlue100 dark:dBlue200 dark:dGray700 hover:lBlue200 hover:lGray300 hover:dark:dBlue300 hover:dark:dGray500"/>
+    w-bg = "cWhite lBlue100 dark:dBlue200 dark:dGray700 dark:dTeal200 hover:lBlue200 hover:lGray300 hover:dark:dBlue300 hover:dark:dGray500"
+    w-border = "1 rounded-md solid dark:dGray200 dark:dTeal300"
+    w-cursor = "not-allowed pointer"
+    w-opacity = "50 100"
+    w-pointer = "all none"/>
 -->

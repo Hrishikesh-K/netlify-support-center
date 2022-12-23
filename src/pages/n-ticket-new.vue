@@ -13,32 +13,67 @@
   import NLogin from '~/client/components/n-login.vue'
   import NSelectInput from '~/client/components/n-select-input.vue'
   import NTextInput from '~/client/components/n-text-input.vue'
-  const store = useStore()
-  const supportCategories : Array<_UiSupportCategory> = [{
-    id: v4(),
-    name: 'Billing'
-  }, {
-    id: v4(),
-    name: 'Edge Functions'
-  }, {
-    id: v4(),
-    name: 'Functions'
-  }, {
-    id: v4(),
-    name: 'Site building'
-  }]
-  let ticketCategory = $ref<_UiSupportCategory>({
-    id: '',
-    name: ''
+  const selectedTicketCategory = $computed(() => {
+    return ticketCategory.find(availableCategory => {
+      return availableCategory.selected
+    }) || {
+      id: '',
+      name: ''
+    }
   })
+  const selectedTicketSites = $computed(() => {
+    return ticketSites.filter(availableSite => {
+      return availableSite.selected
+    })
+  })
+  const usedSize = $computed(() => {
+    return sum(selectedTicketCategory.name.length, selectedTicketSites.reduce((previousTotal, selectedSite) => {
+      return previousTotal + selectedSite.id.length
+    }, 0), ticketSubject.length) as number
+  })
+  const store = useStore()
+  let ticketCategory = $ref<Array<_UiSupportCategory>>([{
+    id: v4(),
+    name: 'Billing',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Edge Functions',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Functions',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Site building',
+    selected: false
+  }])
   let ticketFiles = $ref<Array<_UiFile>>([])
+  let ticketSites = $ref<Array<_UiSupportCategory>>([{
+    id: v4(),
+    name: 'Site 1',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Site 2',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Site 3',
+    selected: false
+  }, {
+    id: v4(),
+    name: 'Site 4',
+    selected: false
+  }])
   let ticketLink = $ref<string>('')
   let ticketMessage = $ref<string>('')
   let ticketSubject = $ref<string>('')
   function ticketSubmit() {
     axios({
       data: {
-        category: ticketCategory,
+        category: selectedTicketCategory!.name,
         files: ticketFiles.map(file => {
           return {
             base64: file.base64,
@@ -46,6 +81,9 @@
           }
         }),
         link: ticketLink,
+        sites: selectedTicketSites.map(site => {
+          return site.id
+        }),
         subject: ticketSubject,
         message: ticketMessage,
       },
@@ -96,18 +134,18 @@
         label = "Category"
         w-m = "t-6"
         w-w = "full xs:2/3 sm:1/2"
-        v-bind:options = "supportCategories"
+        v-bind:options = "ticketCategory"
         v-on:update-choice = "ticketCategory = $event"/>
       <NSelectInput
         multiple
-        label = "Category"
+        label = "Site(s)"
         w-m = "t-6"
         w-w = "full xs:2/3 sm:1/2"
-        v-bind:options = "supportCategories"
-        v-on:update-choice = "ticketCategory = $event"/>
+        v-bind:options = "ticketSites"
+        v-on:update-choice = "ticketSites = $event"/>
       <NEditor
         w-m = "y-6"
-        v-bind:used-size = "sum(ticketCategory.name.length, ticketSubject.length)"
+        v-bind:used-size = "usedSize"
         v-model = "ticketMessage"
         v-on:update-files = "ticketFiles = $event"/>
       <NButton

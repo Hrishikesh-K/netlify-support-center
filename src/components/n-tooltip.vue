@@ -13,11 +13,13 @@
   const tooltipProps = withDefaults(defineProps<{
     content? : string
     fullWidth? : boolean
+    keepOpen? : boolean
     offset? : number
     placement? : Placement
   }>(), {
     content: '',
     fullWidth: false,
+    keepOpen: false,
     offset: 12,
     placement: 'bottom'
   })
@@ -108,7 +110,7 @@
       v-bind:w-w = "tooltipProps.fullWidth ? 'full' : 'auto'"
       v-click-away = "() => tooltipClose()"
       v-if = "tooltipSlots['content']"
-      v-on:click = "tooltipClose">
+      v-on:click = "tooltipProps.keepOpen ? null : tooltipClose">
       <slot
         name = "content"
         v-bind:hide = "tooltipClose"
