@@ -15,6 +15,12 @@ export interface _NAccount {
   priority : number
   type : string
 }
+export interface _NSite {
+  custom_domain? : null | string | undefined
+  id : string
+  name : string
+  selected : boolean
+}
 export interface _NUser {
   accounts : Array<_NAccount>
   avatar_url : string

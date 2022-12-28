@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "chokidar": "3.5.3"
-  },
-  "name": "netlify-plugin-svg-sprite",
-  "type": "module",
-  "version": "1.0.0"
-}

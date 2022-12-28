@@ -10,11 +10,13 @@
     (event : 'updateChoice', value : Array<_UiSupportCategory>) : void
   }>()
   const selectInputProps = withDefaults(defineProps<{
+    disabled? : boolean
     label : string
     limit? : number
     multiple? : boolean
     options : Array<_UiSupportCategory>
   }>(), {
+    disabled: false,
     label: '',
     limit: 5,
     multiple: false,
@@ -68,18 +70,21 @@
 </script>
 <template>
   <div
-    w-cursor = "pointer"
-    w-pos = "relative">
+    w-pos = "relative"
+    v-bind:w-cursor = "selectInputProps.disabled ? 'not-allowed' : 'pointer'"
+    v-bind:w-opacity = "selectInputProps.disabled ? '50' : '100'">
     <NTooltip
       full-width
       keep-open
       v-bind:offset = "2"
       v-on:tooltip-close = "selectOpen = false"
-      v-on:tooltip-open = "selectOpen = true">
+      v-on:tooltip-open = "selectOpen = true"
+      v-bind:w-pointer = "selectInputProps.disabled ? 'none' : 'all'">
       <NTextInput
         readonly
         required
         w-pointer = "none"
+        v-bind:disabled = "selectInputProps.disabled"
         v-bind:dropdown = "selectOpen"
         v-bind:icon-r = "selectOpen ? 'angle-up' : 'angle-down'"
         v-bind:label = "selectInputProps.label"

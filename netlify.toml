@@ -11,7 +11,7 @@
   external_node_modules = ["express"]
   node_bundler = "esbuild"
 [[plugins]]
-  package = "/netlify/plugins/netlify-plugin-svg-sprite"
+  package = "netlify-plugin-svg-sprite"
   [plugins.inputs]
     dist = "./src/assets/"
     src = "./src/icons/"

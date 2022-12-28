@@ -10,9 +10,11 @@ declare global {
         event : HandlerEvent
       }
       body? : {
+        category? : string
         email? : string
         files? : Array<_UiFile>
         message? : string
+        sites? : Array<string>
         subject? : string
         name? : string
       }

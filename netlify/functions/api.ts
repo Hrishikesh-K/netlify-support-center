@@ -17,6 +17,7 @@ import ticketNew from '~/server/routes/ticketNew'
 import ticketUpdate from '~/server/routes/ticketUpdate'
 import ticketView from '~/server/routes/ticketView'
 import userLogout from '~/server/routes/userLogout'
+import userSites from '~/server/routes/userSites'
 import user from '~/server/routes/user'
 export async function handler(event : HandlerEvent, context : HandlerContext) {
   const api = express()
@@ -31,6 +32,7 @@ export async function handler(event : HandlerEvent, context : HandlerContext) {
   router.get('/tickets/organization/:id', ticketList)
   router.get('/tickets/user/:id/:type', ticketList)
   router.get('/user/logout', userLogout)
+  router.get('/user/sites', userSites)
   router.get('/user', user)
   api.use(cookieParser(), json({
     limit: 5505024,

@@ -2,10 +2,11 @@
 <script
   setup
   lang = "ts">
-  import type {_UiFile, _UiSupportCategory} from '~/@types'
+  import type {_NSite, _UiFile, _UiSupportCategory} from '~/@types'
   import axios from 'axios'
   import {sum} from 'mathjs'
   import {v4} from 'uuid'
+  import {watch} from 'vue'
   import {useStore} from '~/client/store'
   import NButton from '~/client/components/n-button.vue'
   import NEditor from '~/client/components/n-editor.vue'
@@ -50,24 +51,7 @@
     selected: false
   }])
   let ticketFiles = $ref<Array<_UiFile>>([])
-  let ticketSites = $ref<Array<_UiSupportCategory>>([{
-    id: v4(),
-    name: 'Site 1',
-    selected: false
-  }, {
-    id: v4(),
-    name: 'Site 2',
-    selected: false
-  }, {
-    id: v4(),
-    name: 'Site 3',
-    selected: false
-  }, {
-    id: v4(),
-    name: 'Site 4',
-    selected: false
-  }])
-  let ticketLink = $ref<string>('')
+  let ticketSites = $ref<Array<_NSite>>([])
   let ticketMessage = $ref<string>('')
   let ticketSubject = $ref<string>('')
   function ticketSubmit() {
@@ -80,7 +64,6 @@
             name: file.name
           }
         }),
-        link: ticketLink,
         sites: selectedTicketSites.map(site => {
           return site.id
         }),
@@ -91,6 +74,21 @@
       url: '/api/ticket/new'
     })
   }
+  watch(() => {
+    return store.nUser.loading
+  }, () => {
+    if (!store.nUser.loading) {
+      axios({
+        url: '/api/user/sites',
+      }).then((siteResponse : {
+        data : Array<_NSite>
+      }) => {
+        ticketSites = siteResponse.data
+      })
+    }
+  }, {
+    immediate: true
+  })
 </script>
 <template>
   <template
@@ -123,13 +121,6 @@
         label = "Subject"
         w-w = "full xs:2/3 sm:1/2"
         v-model = "ticketSubject"/>
-      <NTextInput
-        required
-        label = "Link"
-        type = "url"
-        w-m = "t-6"
-        w-w = "full xs:2/3 sm:1/2"
-        v-model = "ticketLink"/>
       <NSelectInput
         label = "Category"
         w-m = "t-6"
@@ -141,6 +132,7 @@
         label = "Site(s)"
         w-m = "t-6"
         w-w = "full xs:2/3 sm:1/2"
+        v-bind:disabled = "ticketSites.length === 0"
         v-bind:options = "ticketSites"
         v-on:update-choice = "ticketSites = $event"/>
       <NEditor
