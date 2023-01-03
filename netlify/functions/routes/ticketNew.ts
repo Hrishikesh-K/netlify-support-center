@@ -21,7 +21,9 @@ export default function (request : Request, response : Response, next : NextFunc
             data: {
               ticket: {
                 comment: {
-                  html_body: sanitizeHtml(request.body.message),
+                  html_body: `<h3>Subject:</h3><p>${subject}</p><h3>Sites:</h3><ul>${request.body.sites.reduce((currentString : string, currentSite : string) => {
+                    return currentString + `<li>${currentSite}</li>`
+                  }, '')}</ul><h3>Message:</h3>${body}`,
                   uploads
                 },
                 requester_id: request.nf_token!.zd_id,

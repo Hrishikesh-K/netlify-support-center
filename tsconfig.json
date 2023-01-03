@@ -64,9 +64,9 @@
     "stripInternal": true,
     "suppressImplicitAnyIndexErrors": false,
     "target": "ESNext",
-    "typeRoots": ["@types", "node_modules/@types"],
+    "typeRoots": ["./@types/", "./node_modules/@types/"],
     "useDefineForClassFields": true,
     "useUnknownInCatchVariables": true
   },
-  "include": ["./netlify/functions/**/*", "./src/**/*"],
+  "include": ["./@types/**/*" ,"./netlify/functions/**/*", "./src/**/*", "./vite.config.ts", "./windi.config.ts"],
 }

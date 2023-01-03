@@ -50,13 +50,14 @@
   let attachInput = $ref<null | HTMLInputElement>(null)
   let dragActive = $ref<boolean>(false)
   let editor = $(useEditor({
+    content: editorProps.modelValue,
     editorProps: {
       attributes: {
         'w-border': 'rounded-b-md',
         'w-min-h': '37.5',
         'w-outline': 'none',
-        'w-p': '3',
-        'w-text': 'space-pre-wrap'
+        'w-p': '3 b-6',
+        'w-text': 'break-all space-pre-wrap'
       }
     },
     extensions: [Blockquote.extend({
@@ -123,12 +124,9 @@
       editorEmits('update:modelValue', instance.editor.getHTML())
     }
   }))
-  let editorContent = $computed<string>(() => {
-    return editorProps.modelValue
-  })
   let editorMetaKey = $ref<'^' | '⌘'>('^')
   let totalSizeLeft = $computed<number>(() => {
-    return floor(subtract(multiply(5, (pow(1024, 2) as number)), add(editorProps.usedSize, add(editorContent.length, attachedFiles.reduce((currentSize, currentFile) => {
+    return floor(subtract(multiply(5, (pow(1024, 2) as number)), add(editorProps.usedSize, add(editorProps.modelValue.length, attachedFiles.reduce((currentSize, currentFile) => {
       return add(currentSize, add(currentFile.base64.length, currentFile.name.length))
     }, 0)))))
   })
@@ -258,7 +256,8 @@
           w-align = "items-center"
           w-flex = "~"
           w-p = "3"
-          w-space = "x-3">
+          w-space = "x-3"
+          w-w = "fit">
           <div
             w-align = "items-center"
             w-flex = "~"
@@ -352,119 +351,115 @@
                 v-on:click = "editor?.chain().focus().toggleCodeBlock().run()"/>
             </NTooltip>
           </div>
+          <NTooltip
+            content = "Attach files">
+            <NButton
+              icon = "paperclip"
+              level = "secondary"
+              v-on:click = "attachInput?.click()"/>
+          </NTooltip>
         </div>
       </div>
       <EditorContent
-        v-bind:editor = "editor"
-        v-model = "editorContent"/>
-    </div>
-    <div
-      w-max-w = "xs:111"
-      w-w = "full">
+        v-bind:editor = "editor"/>
       <div
-        w-bg = "cWhite dark:cBlack"
-        w-border = "~ lGray300 rounded-lg solid dark:dGray700"
-        w-p = "y-6"
-        w-shadow = "lShallow dark:dShallow">
+        w-align = "items-center"
+        w-flex = "~"
+        w-gap = "x-3"
+        w-justify = "between"
+        w-m = "b-2 x-6">
+        <h2
+          w-m = "0">Attachments</h2>
+        <p
+          w-m = "0">~ {{fileSize(totalSizeLeft)}}</p>
+      </div>
+      <hr
+        w-border = "0 lGray100 t-1 dark:dGray300"
+        w-m = "0 b-6 x-6"/>
+      <div
+        class = "drag-parent"
+        ref = "dragDropEl"
+        w-border = "rounded-md"
+        w-m = "b-6 x-6"
+        w-p = "3"
+        v-bind:w-bg = "dragActive ? 'lTeal300 dark:dTeal300' : 'lGray300 dark:dGray500'"
+        v-bind:w-text = "dragActive ? 'lTeal500 dark:dTeal500' : 'cBlack dark:cWhite'">
+        <div
+          w-align = "items-center"
+          w-flex = "~ wrap"
+          w-justify = "center"
+          w-p = "3"
+          v-bind:w-border = "`${dragActive ? 'lTeal500 dark:dTeal500' : 'cBlack dark:cWhite'} 2 dashed rounded-md`">
+          <button
+            type = "button"
+            w-bg = "wTransparent"
+            w-border = "0"
+            w-cursor = "pointer"
+            w-font = "sans"
+            w-p = "0"
+            w-text = "base underline wCurrent"
+            v-on:click = "attachInput?.click()">Choose files</button>
+          <span>&nbsp;or drop them here</span>
+          <input
+            hidden
+            multiple
+            ref = "attachInput"
+            type = "file"
+            w-display = "hidden"
+            v-on:input = "fileInput"/>
+        </div>
+      </div>
+      <template
+        v-if = "attachedFiles.length > 0">
         <div
           w-align = "items-center"
           w-flex = "~"
+          w-font = "bold"
           w-gap = "x-3"
-          w-justify = "between"
-          w-m = "b-2 x-6">
-          <h2
-            w-m = "0">Attachments</h2>
+          w-p = "x-6 y-3">
+          <div
+            w-h = "6"
+            w-w = "6">
+          </div>
           <p
-            w-m = "0">~ {{fileSize(totalSizeLeft)}}</p>
+            w-m = "0"
+            w-w = "50">Name</p>
+          <p
+            w-m = "0"
+            w-w = "25">Transfer</p>
         </div>
-        <hr
-          w-border = "0 lGray100 t-1 dark:dGray300"
-          w-m = "0 b-6 x-6"/>
-        <template
-          v-if = "attachedFiles.length > 0">
-          <div
-            w-align = "items-center"
-            w-flex = "~"
-            w-font = "bold"
-            w-gap = "x-3"
-            w-p = "x-6 y-3">
-            <div
-              w-h = "6"
-              w-w = "6">
-            </div>
-            <p
-              w-m = "0"
-              w-w = "50">Name</p>
-            <p
-              w-m = "0"
-              w-w = "25">Transfer</p>
-          </div>
-          <div
-            w-m = "b-6"
-            w-max-h = "45"
-            w-overflow = "y-auto"
-            w-scrollbar = "thin thumb-lTeal400 track-lTeal500 dark:thumb-dTeal400 dark:track-dTeal500">
-            <div
-              w-align = "items-center"
-              w-bg = "even:lSeparator/2 even:dark:cWhite/3 hover:lSeparator/3 hover:dark:cWhite/4"
-              w-flex = "~"
-              w-gap = "x-3"
-              w-p = "x-6 y-3"
-              v-bind:key = "file.md5"
-              v-for = "(file, fileIndex) in attachedFiles">
-              <NIcon
-                name = "file-arrow-up"
-                v-bind:size = "6"/>
-              <p
-                w-m = "0"
-                w-text = "truncate"
-                w-w = "50">{{file.name}}</p>
-              <p
-                w-m = "0"
-                w-w = "25">{{fileSize(file.base64.length)}}</p>
-              <NTooltip
-                content = "Remove">
-                <NButton
-                  icon = "trash-can"
-                  v-on:click = "removeFile(fileIndex)"/>
-              </NTooltip>
-            </div>
-          </div>
-        </template>
         <div
-          class = "drag-parent"
-          ref = "dragDropEl"
-          w-border = "rounded-md"
-          w-m = "x-6"
-          w-p = "3"
-          v-bind:w-bg = "dragActive ? 'lTeal300 dark:dTeal300' : 'lGray300 dark:dGray500'"
-          v-bind:w-text = "dragActive ? 'lTeal500 dark:dTeal500' : 'cBlack dark:cWhite'">
+          w-m = "b-6"
+          w-max-h = "45"
+          w-overflow = "y-auto"
+          w-scrollbar = "thin thumb-lTeal400 track-lTeal500 dark:thumb-dTeal400 dark:track-dTeal500">
           <div
             w-align = "items-center"
-            w-flex = "~ wrap"
-            w-justify = "center"
-            w-p = "3"
-            v-bind:w-border = "`${dragActive ? 'lTeal500 dark:dTeal500' : 'cBlack dark:cWhite'} 2 dashed rounded-md`">
-            <button
-              type = "button"
-              w-bg = "wTransparent"
-              w-border = "0"
-              w-cursor = "pointer"
-              w-font = "sans"
-              w-p = "0"
-              w-text = "base underline wCurrent"
-              v-on:click = "attachInput?.click()">Choose files</button>
-            <span>&nbsp;or drop them here</span>
-            <input
-              hidden
-              multiple
-              ref = "attachInput"
-              type = "file"
-              w-display = "hidden"
-              v-on:input = "fileInput"/>
+            w-bg = "even:lSeparator/2 even:dark:cWhite/3 hover:lSeparator/3 hover:dark:cWhite/4"
+            w-flex = "~"
+            w-gap = "x-3"
+            w-p = "x-6 y-3"
+            v-bind:key = "file.md5"
+            v-for = "(file, fileIndex) in attachedFiles">
+            <NIcon
+              name = "file-arrow-up"
+              v-bind:size = "6"/>
+            <p
+              w-m = "0"
+              w-text = "truncate"
+              w-w = "50">{{file.name}}</p>
+            <p
+              w-m = "0"
+              w-w = "25">{{fileSize(file.base64.length)}}</p>
+            <NTooltip
+              content = "Remove">
+              <NButton
+                icon = "trash-can"
+                v-on:click = "removeFile(fileIndex)"/>
+            </NTooltip>
           </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -478,7 +473,7 @@
     w-m = "0 l-1.5 l-3 r-0 y-3"
     w-min-h = "37.5"
     w-outline = "none"
-    w-p = "1.5 3 l-3 x-2 y-1"
+    w-p = "1.5 3 b-6 l-3 x-2 y-1"
     w-pointer = "all:none"
-    w-text = "cBlack lTeal500 space-pre-wrap underline dark:cWhite dark:dTeal500"/>
+    w-text = "break-all cBlack lTeal500 space-pre-wrap underline dark:cWhite dark:dTeal500"/>
 -->

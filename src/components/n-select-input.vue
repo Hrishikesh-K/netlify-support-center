@@ -116,7 +116,7 @@
                     w-pointer = "none"
                     w-pos = "absolute left-5 top-3"
                     w-text = "dark:dTeal500"
-                    name = "checkbox-tick"
+                    name = "check"
                     v-bind:size = "3"
                     v-if = "option.selected"/>
                   <label
@@ -141,18 +141,30 @@
                   </label>
                 </div>
               </template>
-              <div
-                w-box = "border"
-                w-cursor = "pointer"
-                w-font = "medium"
-                w-p = "x-4 y-2"
-                w-text = "lGray700 truncate dark:dGray100"
-                w-w = "full"
-                v-bind:key = "option.id"
-                v-bind:w-bg = "option.selected ? 'lBlue100 dark:dBlue200 hover:lBlue200 hover:dark:dBlue300' : 'cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500'"
-                v-else
-                v-for = "option in selectInputProps.options"
-                v-on:click = "choiceClick(option); props.hide()">{{option.name}}</div>
+              <template
+                v-else>
+                <div
+                  w-align = "items-center"
+                  w-bg = "cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500"
+                  w-box = "border"
+                  w-cursor = "pointer"
+                  w-flex = "~"
+                  w-font = "medium"
+                  w-p = "x-4 y-2"
+                  w-text = "lGray700 truncate dark:dGray100"
+                  w-w = "full"
+                  v-bind:key = "option.id"
+                  v-for = "option in selectInputProps.options"
+                  v-on:click = "choiceClick(option); props.hide()">
+                  <NIcon
+                    w-pointer = "none"
+                    name = "check"
+                    v-bind:size = "3"
+                    v-if = "option.selected"/>
+                  <span
+                    w-m = "l-2">{{option.name}}</span>
+                </div>
+              </template>
             </div>
           </div>
         </template>
@@ -161,7 +173,7 @@
 </template>
 <!--
   <safe
-    w-bg = "cWhite lBlue100 dark:dBlue200 dark:dGray700 dark:dTeal200 hover:lBlue200 hover:lGray300 hover:dark:dBlue300 hover:dark:dGray500"
+    w-bg = "cWhite dark:dGray700 hover:lGray300 hover:dark:dGray500"
     w-border = "1 rounded-md solid dark:dGray200 dark:dTeal300"
     w-cursor = "not-allowed pointer"
     w-opacity = "50 100"
